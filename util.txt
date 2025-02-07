@@ -1,0 +1,26 @@
+1 - Criar o ambiente Virtual:
+Criar e ativar um ambiente virtual
+Recomenda-se criar um ambiente virtual para isolar as dependências do projeto. Execute os seguintes comandos:
+
+No Windows:
+python -m venv venv
+venv\Scripts\activate
+
+No macOS/Linux:
+python3 -m venv venv
+source venv/bin/activate
+
+2 - Criar requirements.txt
+Rodar o comando para instalar o 
+pip install fastapi
+pip install uvicorn
+
+pip freeze > requirements.txt
+
+Toda vez que instalar alguma dependência/pacote atualizar o requirements
+pip install -r requirements.txt
+
+
+3 - Para rodar o servidor
+
+uvicorn main:app --reload
