@@ -22,12 +22,14 @@ def register(user_data: schema_user.UserCreate, db: Session = Depends(get_db)):
     try:
         #veifica se o usuario já existe com o mesmo nome
         db_user = db.query(user_db.User).filter(user_db.User.username == user_data.username).first()
+        print(f'Role: {db_user}')
 
         if db_user:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario já registrado!!!")
         
         # Criptografa a senha do usuario
         hashed_password = auth.hash_password(user_data.password)
+        print(f'Hashed Password {hashed_password}')
 
         # Cria um novo objeto
         new_user = user_db.User(username=user_data.username, hashed_password=hashed_password, email=user_data.email)
@@ -47,6 +49,7 @@ def register(user_data: schema_user.UserCreate, db: Session = Depends(get_db)):
         # Retorna os dados como Pydantic (convertendo o objeto SQLAlchemy)
         # Conversão usando from_orm
         return schema_user.User.from_orm(new_user)
+        #return {'Usuario Cadastrado com Sucesso'}
     except Exception as e:
         logger.error(f"Erro ao criar o usuário {e}")
         db.rollback()
