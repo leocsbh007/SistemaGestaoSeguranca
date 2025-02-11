@@ -4,11 +4,11 @@ from enum import Enum
 
 
 class RoleType(str, Enum):
-    ADMIN = "admin"
-    FUNCIONARIO = "funcionario"
-    GERENTE = "gerente"
-    ADMIN_SEGURANCA = "admin_seguranca"
-
+    ADMIN = "ADMIN"
+    FUNCIONARIO = "FUNCIONARIO"
+    GERENTE = "GERENTE"
+    ADMIN_SEGURANCA = "ADMIN_SEGURANCA"
+    
 # Cria um Modelo de usuario
 class UserBase(BaseModel):
     username: str

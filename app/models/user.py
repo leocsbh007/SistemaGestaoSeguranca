@@ -4,11 +4,11 @@ from app.models.base import Base
 import enum
 
 class RoleType(enum.Enum):
-    ADMIN = "admin"
-    FUNCIONARIO = "funcionario"
-    GERENTE = "gerente"
-    ADMIN_SEGURANCA = "admin_seguranca"
-
+    ADMIN = "ADMIN"
+    FUNCIONARIO = "FUNCIONARIO"
+    GERENTE = "GERENTE"
+    ADMIN_SEGURANCA = "ADMIN_SEGURANCA"
+ 
 
 class User(Base):
     __tablename__ = "users"
@@ -20,7 +20,7 @@ class User(Base):
     is_active = Column(Boolean, default=True) # Padrão usuario Ativo
     is_admin = Column(Boolean, default=False) # Padrão não ser Admin
     
-    role = relationship("Role", back_populates="user", uselist=False) # Relação com a tabela Role
+    role = relationship("Role", back_populates="user", uselist=False, cascade="all, delete") # Relação com a tabela Role
 
 
 class Role(Base):
@@ -30,6 +30,6 @@ class Role(Base):
     role_type = Column(Enum(RoleType), default=RoleType.FUNCIONARIO)    # Pega o enum da class RoleType
 
     # Chave estrangeira que se refere à tabela de users
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE")) # Chave estrangeira para a tabela User
 
     user = relationship("User", back_populates="role") # Relação com a tabela User

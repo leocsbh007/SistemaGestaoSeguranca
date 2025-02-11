@@ -1,0 +1,1 @@
+UPDATE roles SET role_type = UPPER(role_type);

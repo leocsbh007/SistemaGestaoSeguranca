@@ -30,7 +30,7 @@ def create_token(data:dict, expires_delta):
 # @router.post("/login", response_model=schema_user.User)
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    print("Form Data: ", form_data)
+    # print("Form Data: ", form_data)
 
     # Busca usuario no Banco de Dados
     db_user = db.query(user_db.User).filter(user_db.User.username == form_data.username).first()
@@ -49,12 +49,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             headers={"WWW-Authenticate" : "Beares"}
         )
     # Cria o Token Jwt
-    print(f"Gerando o token para Usuario {db_user.username}")    
+    # print(f"Gerando o token para Usuario {db_user.username}")    
     token = create_token({"sub" : db_user.username},
                          expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
 
-    print(f"Token Gerado: {token}")  # <--- Adicionando log para depuração
+    # print(f"Token Gerado: {token}")  # <--- Adicionando log para depuração
 
     response_data = {
         "access_token": token,
@@ -66,7 +66,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         "is_admin": db_user.is_admin
     }
 
-    print(f"Resposta Final: {response_data}")  # <--- Adicionando log para depuração
+    # print(f"Resposta Final: {response_data}")  # <--- Adicionando log para depuração
 
     return response_data
 
