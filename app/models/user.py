@@ -21,6 +21,10 @@ class User(Base):
     is_admin = Column(Boolean, default=False) # Padrão não ser Admin
     
     role = relationship("Role", back_populates="user", uselist=False, cascade="all, delete") # Relação com a tabela Role
+    resources = relationship("Resource", back_populates="user", cascade="all, delete") # Relação com a tabela Resource
+
+    # Relacionamento com a tabela de empréstimos (Loans)
+    loans = relationship("Loan", back_populates="user", cascade="all, delete") # Relação com a tabela Loan
 
 
 class Role(Base):
@@ -33,3 +37,5 @@ class Role(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE")) # Chave estrangeira para a tabela User
 
     user = relationship("User", back_populates="role") # Relação com a tabela User
+
+
