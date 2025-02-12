@@ -19,7 +19,7 @@ class StatusType(enum.Enum):
 class Resource(Base):
     __tablename__ = 'resources'
 
-    id = Column(Integer, primaty_key=True, index=True) # Identificador do recurso
+    id = Column(Integer, primary_key=True, index=True) # Identificador do recurso
     name = Column(String, nullable=False) # Nome do recurso, obrigatório
     type = Column(Enum(ResourseType), nullable=False) # Tipo do recurso, obrigatório. Deve ser um dos valores definidos em ResourseType
     description = Column(String, nullable=False) # Descrição do recurso, obrigatório
@@ -32,3 +32,6 @@ class Resource(Base):
 
     # Relacionamento com a tabela de empréstimos (Loans)
     loans = relationship("Loan", back_populates="resource", cascade="all, delete") # Relação com a tabela Loan
+
+
+    
