@@ -4,6 +4,7 @@ from app.models.base import get_db
 from app.models import user as user_db  # Para o modelo do banco
 from app.schemas.user import UserIn, UserOut
 from app.services.user import register_user
+from app.auth.middleware import require_admin
 import logging
 
 # Configuração de Logger para log
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Criando um novo usuario
-@router.post("/users", response_model=UserOut,dependencies=[Depends(require_admin)] status_code=status.HTTP_201_CREATED)
+@router.post("/users/", response_model= UserOut, dependencies=[Depends(require_admin)], status_code=status.HTTP_201_CREATED)
 def create_user(user_in: UserIn, db: Session = Depends(get_db)):
     '''Rota para criar um novo usuario'''
     try:
