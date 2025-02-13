@@ -15,12 +15,12 @@ class UserBase(BaseModel):
     email: EmailStr
 
 # Cria um Modelo de usuario com role padrão com Funcionario
-class UserCreate(UserBase):    
+class UserIn(UserBase):    
     password: str
     role: Optional[RoleType] = RoleType.FUNCIONARIO 
 
 # Cria um modelo para representar um usuario existente no Banco de Dados
-class User(UserBase):
+class UserOut(UserBase):
     id: Optional [int]
     is_active: Optional [bool] = True # Por padrão o usuario é ativo
     is_admin: Optional [bool] = False # Por padrão o usuario não é admin

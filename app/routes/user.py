@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from app.models.base import get_db
 from app.models import user as user_db  # Para o modelo do banco
-from app.schemas import user as schema_user # Para o modelo schema do pydantic
-from app.services import auth
+from app.schemas.user import UserIn, UserOut
+from app.services.user import register_user
 import logging
 
 # Configuração de Logger para log
@@ -12,23 +12,27 @@ logger = logging.getLogger(__name__)
 # Cria um roteador para a rota de usuarios
 router = APIRouter()
 
-# Banco Mocado
-mocado_db_users = []
-
 # Criando um novo usuario
-@router.post("/register", response_model=schema_user.User, status_code=status.HTTP_201_CREATED)
-def register(user_data: schema_user.UserCreate, db: Session = Depends(get_db)):
-    
+@router.post("/users", response_model=UserOut,dependencies=[Depends(require_admin)] status_code=status.HTTP_201_CREATED)
+def create_user(user_in: UserIn, db: Session = Depends(get_db)):
+    '''Rota para criar um novo usuario'''
+    try:
+        return register_user(db, user_in)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao criar o Usuario, usuário já existe"
+        )    
     
     
 # Deletando um usuario
-@router.delete("/delete/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     # print(f'User ID: {user_id}')
 
     try:
         # Busca o usuario no banco de dados
-        db_user = db.query(user_db.User).filter(user_db.User.id == user_id).first()
+        db_user = db.query(user_db.DBUser).filter(user_db.DBUser.id == user_id).first()
         # print(f'Id User: {db_user.id}')
         # print(f"Usuário encontrado: {db_user.id}, Role: {db_user.role}")  # <- DEBUG
         if db_user is None:

@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
 from app.models.base import get_db
 from app.models import user as user_db  # Para o modelo do banco
-from app.schemas import user as schema_user # Para o modelo schema do pydantic
 from app.services.auth import verify_password
 from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 import logging
@@ -33,7 +32,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     # print("Form Data: ", form_data)
 
     # Busca usuario no Banco de Dados
-    db_user = db.query(user_db.User).filter(user_db.User.username == form_data.username).first()
+    db_user = db.query(user_db.DBUser).filter(user_db.DBUser.username == form_data.username).first()
     
     if db_user is None:
         raise HTTPException(
@@ -50,9 +49,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         )
     # Cria o Token Jwt
     # print(f"Gerando o token para Usuario {db_user.username}")    
-    token = create_token({"sub" : db_user.username},
-                         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
+    token = create_token({"sub" : db_user.username})
 
     # print(f"Token Gerado: {token}")  # <--- Adicionando log para depuração
 

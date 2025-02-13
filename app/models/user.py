@@ -10,7 +10,7 @@ class RoleType(enum.Enum):
     ADMIN_SEGURANCA = "ADMIN_SEGURANCA"
  
 
-class User(Base):
+class DBUser(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -20,14 +20,11 @@ class User(Base):
     is_active = Column(Boolean, default=True) # Padrão usuario Ativo
     is_admin = Column(Boolean, default=False) # Padrão não ser Admin
     
-    role = relationship("Role", back_populates="user", uselist=False, cascade="all, delete") # Relação com a tabela Role
-    resources = relationship("Resource", back_populates="user", cascade="all, delete") # Relação com a tabela Resource
+    role = relationship("DBRole", back_populates="user", uselist=False, cascade="all, delete")  # Relação com a tabela Role    
+    resource = relationship("DBResource", back_populates="user", cascade="all", passive_deletes=True)  # Remove a referência, não apaga o recurso
+    loan = relationship("DBLoan", back_populates="user", cascade="all, delete")  # Relação com a tabela Loan
 
-    # Relacionamento com a tabela de empréstimos (Loans)
-    loans = relationship("Loan", back_populates="user", cascade="all, delete") # Relação com a tabela Loan
-
-
-class Role(Base):
+class DBRole(Base):
     __tablename__ = "roles" # Nome da Tabela no Banco
 
     id = Column(Integer, primary_key=True, index=True)
@@ -36,6 +33,6 @@ class Role(Base):
     # Chave estrangeira que se refere à tabela de users
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE")) # Chave estrangeira para a tabela User
 
-    user = relationship("User", back_populates="role") # Relação com a tabela User
+    user = relationship("DBUser", back_populates="role") # Relação com a tabela User
 
 

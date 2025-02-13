@@ -9,7 +9,7 @@ class LonasStatus(enum.Enum):
     FINALIZADO = 'FINALIZADO'
     ATRASADO = 'ATRASADO'
 
-class Loan(Base):
+class DBLoan(Base):
     __tablename__ = 'loans'
 
     id = Column(Integer, primary_key=True, index=True) # Identificador do empréstimo
@@ -19,10 +19,10 @@ class Loan(Base):
 
 
     # Definição do relacionamento com a tabela de usuários
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False) # Chave estrangeira para a tabela User, deve ser obrigatória
-    user = relationship("User", back_populates="loans") # Relação com a tabela User
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)  # Chave estrangeira para a tabela User    
+    user = relationship("DBUser", back_populates="loan")  # Relação com a tabela User
 
-    # Definição do relacionamento com a tabela de recursos
-    resource_id = Column(Integer, ForeignKey("resources.id", ondelete="CASCADE"), nullable=False) # Chave estrangeira para a tabela Resource, deve ser obrigatória
-    resource = relationship("Resource", back_populates="loans") # Relação com a tabela Resource
+    # Definição do relacionamento com a tabela de recursos    
+    resource_id = Column(Integer, ForeignKey("resources.id", ondelete="CASCADE"), nullable=False)  # Chave estrangeira para a tabela Resource
+    resource = relationship("DBResource", back_populates="loan")  # Relação com a tabela Resource
 

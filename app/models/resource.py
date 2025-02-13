@@ -16,7 +16,7 @@ class StatusType(enum.Enum):
 
 
 # Definição da classe de recursos
-class Resource(Base):
+class DBResource(Base):
     __tablename__ = 'resources'
 
     id = Column(Integer, primary_key=True, index=True) # Identificador do recurso
@@ -26,12 +26,13 @@ class Resource(Base):
     status = Column(Enum(StatusType), nullable=False, default=StatusType.DISPONIVEL) # Status do recurso, obrigatório. Deve ser um dos valores definidos em StatusType
 
 
-    # Definição do relacionamento com a tabela de users
-    assigned_to = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=False) # Chave estrangeira para a tabela User, deve se obrigatória
-    user = relationship("User", back_populates="resources") # Relação com a tabela User
+    # Definição do relacionamento com a tabela de users    
+    assigned_to = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)  # Chave estrangeira para a tabela User, pode ser nula
+    user = relationship("DBUser", back_populates="resource")  # Relação com a tabela User
 
-    # Relacionamento com a tabela de empréstimos (Loans)
-    loans = relationship("Loan", back_populates="resource", cascade="all, delete") # Relação com a tabela Loan
+
+    # Relacionamento com a tabela de empréstimos (Loans)    
+    loan = relationship("DBLoan", back_populates="resource", cascade="all, delete")  # Relação com a tabela Loan
 
 
     

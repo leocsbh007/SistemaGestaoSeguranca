@@ -5,7 +5,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # Função para hash de senha
-def hash_password(password: str):
+def hash_password(password: str):    
     return pwd_context.hash(password)
 
 # Função para verificar a Senha
