@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-import jwt
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta, timezone
 from app.models.base import get_db
 from app.models import user as user_db  # Para o modelo do banco
-from app.services.auth import verify_password
-from app.auth.security import create_access_token, verify_password
+from app.schemas.user import UserIn
+from app.auth import security
+from app.repositories import user as user_repositories
 
 from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 import logging
@@ -20,19 +19,23 @@ router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # Criando a Rota de Login
-@router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    # Busca usuario no Banco de Dados
-    db_user = db.query(user_db.DBUser).filter(user_db.DBUser.username == form_data.username).first()
-    
-    if db_user is None:
+@router.post("/login") # ANA
+# def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(user_in: UserIn, db: Session = Depends(get_db)):
+    # Busca usuario no Banco de Dados    
+    db_user = user_repositories.get_user_by_email(db, user_in.email)   
+    # Verifica se o usuario está ativo 
+    if user_repositories.get_user_is_active(db, db_user.username) == False:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    #Verifica se o usuario existe
+    if user_repositories.get_user_by_username(db, user_in.username) != db_user.username:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário Não encontrado",
-            headers={"WWW-Authenticate" : "Beares"}
+            detail="Usuario não encontrado"
         )
     
-    if not verify_password(form_data.password, db_user.hashed_password):
+
+    if not security.verify_password(user_in.password, db_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Senha Incorretos",
@@ -40,7 +43,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         )
     # Cria o Token Jwt
     # print(f"Gerando o token para Usuario {db_user.username}")    
-    token = create_access_token({"sub" : db_user.username})
+    token = security.create_access_token({"sub" : db_user.email})
 
     # print(f"Token Gerado: {token}")  # <--- Adicionando log para depuração
 
@@ -64,6 +67,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 @router.get("/me")
 def read_users_me(token: str = Depends(oauth2_scheme)):
     # print(f"Token: {token}")
-    payload = decode_token(token)
+    payload = security.decode_access_token(token)
     # print(f"Payload: {payload}")
     return {"user": payload}

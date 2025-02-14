@@ -15,7 +15,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> user_repo.DBUser:
     payload = decode_access_token(token)        
-    if payload:
+    print(f"Payload: {payload}")
+    if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token Inválido, ou Expirado"

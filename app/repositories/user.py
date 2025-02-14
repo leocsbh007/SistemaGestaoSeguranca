@@ -2,21 +2,37 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from app.models.user import DBUser, DBRole
 from app.schemas.user import UserIn
-from app.services import auth as auth_service
+from app.auth import security
 import logging
 
 # Configuração de Logger para log
 logger = logging.getLogger(__name__)
 
+
 def get_user_by_email(db: Session, email: str) -> DBUser | None:
     '''Retorna um usuario pelo email'''
     return db.query(DBUser).filter(DBUser.email == email).first()
 
+def get_user_by_username(db: Session, username: str) -> DBUser | None:
+    '''Retorna um usuario pelo nome'''
+    return db.query(DBUser).filter(DBUser.username == username).first()
+
+
+def get_user_is_active(db: Session, user_id: int) -> bool:
+    '''Verifica se o usuario está ativo'''
+    db_user = get_user_by_username(db, db_user.username)
+    if db_user.is_active == False:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário Não Está Ativo",
+            headers={"WWW-Authenticate" : "Beares"}
+        )
+    return True
 
 def create_user(db: Session, user_in: UserIn) -> DBUser:
 
-    try:
-        hashed_password_in = auth_service.hash_password(user_in.password)
+    try:        
+        hashed_password_in = security.hash_password(user_in.password)
 
         # Cria um Objeto Usuario para adicionar no Banco
         db_user = DBUser(
