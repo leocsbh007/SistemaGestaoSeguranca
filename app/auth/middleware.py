@@ -13,8 +13,7 @@ logger = logging.getLogger(__name__)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    '''Função para pegar o usuário atual'''
+def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> user_repo.DBUser:
     payload = decode_access_token(token)        
     if payload:
         raise HTTPException(
@@ -22,15 +21,15 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
             detail="Token Inválido, ou Expirado"
         )
     user_email = payload.get("sub")
-    user = user_repo.get_user_by_email(db, user_email)
+    db_user = user_repo.get_user_by_email(db, user_email)
     
-    if not user:
+    if not db_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
             detail="Usuário Não Encontrado"
         )
     
-    return user
+    return db_user
 
 
 def require_admin(current_user = Depends(get_current_user)):
