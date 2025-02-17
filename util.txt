@@ -24,3 +24,29 @@ pip install -r requirements.txt
 3 - Para rodar o servidor
 
 uvicorn app.main:app --reload
+
+
+4 - Git Pull Branches
+
+Para trazer as branches remotas no Git, você pode usar o comando:
+
+git fetch
+
+Este comando vai buscar as últimas atualizações do repositório remoto, incluindo novas branches. Porém, ele não faz o checkout de nenhuma branch automaticamente.
+Se você quiser ver todas as branches remotas disponíveis, use:
+
+git branch -r
+
+E para listar todas as branches locais e remotas, use:
+
+git branch -a
+
+Caso você queira fazer checkout de uma branch remota específica, você pode usar:
+
+git checkout nome-da-branch
+
+Ou, caso ela ainda não tenha sido criada localmente:
+
+git checkout -b nome-da-branch origin/nome-da-branch
+
+Isso cria uma branch local com base na branch remota.

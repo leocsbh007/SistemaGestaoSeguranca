@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from app.models.base import create_all, seed_adimin, get_db
 from app.routes.auth import router as auth_router  # Importando as rotas de autenticação
 from app.routes.user import router as user_router  # Importando as rotas de usuários
-from app.models.base import create_all
 from contextlib import asynccontextmanager
 
 
@@ -14,9 +14,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, debug=True)
 
+with next(get_db()) as db:
+    seed_adimin(db)
+
 # Incluindo as rotas no app Fast API
-# app.include_router(auth.router, prefix="/auth", tags=["authentication"])
-# app.include_router(user.router, prefix="/user", tags=["users"])
 app.include_router(auth_router, prefix="", tags=["Auth"])
 app.include_router(user_router, prefix="", tags=["User"])
 
