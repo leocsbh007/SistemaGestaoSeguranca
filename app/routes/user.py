@@ -5,7 +5,7 @@ from app.models.base import get_db
 from app.models import user as user_db  # Para o modelo do banco
 from app.schemas.user import UserIn, UserOut
 from app.services.user import register_user
-from app.auth.middleware import require_admin
+from app.auth.middleware import require_admin, get_current_user
 from app.repositories import user as user_repositories
 from app.auth import security
 import logging
@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Rota para listar todos os usuarios
-@router.get("/users/", response_model=list[UserOut], dependencies=[Depends(require_admin)])
+@router.get("/users/", response_model=list[UserOut], dependencies=[Depends(get_current_user)])
 def get_users(db: Session = Depends(get_db)):
     '''Rota para listar todos os usuarios'''
     return db.query(user_db.DBUser).all()
 
 # Rota para buscar um usuario pelo ID
-@router.get("/users/{user_id}", response_model=UserOut, dependencies=[Depends(require_admin)])
+@router.get("/users/{user_id}", response_model=UserOut, dependencies=[Depends(get_current_user)])
 def get_user(user_id: int, db: Session = Depends(get_db)):
     '''Rota para buscar um usuario pelo ID'''
     db_user = db.query(user_db.DBUser).filter(user_db.DBUser.id == user_id).first()
