@@ -6,7 +6,6 @@ from app.models import user as user_db  # Para o modelo do banco
 from app.schemas.user import UserIn
 from app.auth import security
 from app.repositories import user as user_repositories
-
 from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 import logging
 
@@ -25,10 +24,12 @@ def login(user_in: UserIn, db: Session = Depends(get_db)):
     # Busca usuario no Banco de Dados    
     db_user = user_repositories.get_user_by_email(db, user_in.email)   
     # Verifica se o usuario está ativo 
-    if user_repositories.get_user_is_active(db, db_user.username) == False:
+    
+    if user_repositories.get_user_is_active(db, db_user.username) == False:        
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
     #Verifica se o usuario existe
-    if user_repositories.get_user_by_username(db, user_in.username) != db_user.username:
+    if user_repositories.get_user_by_username(db, user_in.username) is None:        
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario não encontrado"
@@ -38,7 +39,7 @@ def login(user_in: UserIn, db: Session = Depends(get_db)):
     if not security.verify_password(user_in.password, db_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Senha Incorretos",
+            detail="Senha Incorreta",
             headers={"WWW-Authenticate" : "Beares"}
         )
     # Cria o Token Jwt

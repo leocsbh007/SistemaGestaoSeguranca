@@ -15,12 +15,20 @@ def get_user_by_email(db: Session, email: str) -> DBUser | None:
 
 def get_user_by_username(db: Session, username: str) -> DBUser | None:
     '''Retorna um usuario pelo nome'''
-    return db.query(DBUser).filter(DBUser.username == username).first()
+    response = db.query(DBUser).filter(DBUser.username == username).first()    
+    #return db.query(DBUser).filter(DBUser.username == username).first()
+    return response
+
+def get_user_by_id(db: Session, user_id: int) -> DBUser | None:
+    '''Retorna um usuario pelo id'''
+    response = db.query(DBUser).filter(DBUser.id == user_id).first()        
+    return response
 
 
-def get_user_is_active(db: Session, user_id: int) -> bool:
+
+def get_user_is_active(db: Session, user_name: str) -> bool:
     '''Verifica se o usuario está ativo'''
-    db_user = get_user_by_username(db, db_user.username)
+    db_user = get_user_by_username(db, user_name)    
     if db_user.is_active == False:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
