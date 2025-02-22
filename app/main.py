@@ -25,7 +25,6 @@ app.add_middleware(
 )
 
 
-
 #with next(get_db()) as db:
 initialize_admin()
 
