@@ -8,22 +8,28 @@ class RoleType(str, Enum):
     FUNCIONARIO = "FUNCIONARIO"
     GERENTE = "GERENTE"
     ADMIN_SEGURANCA = "ADMIN_SEGURANCA"
+
+class RoleOUt(BaseModel):
+    role_type: RoleType
+
+    class Config:
+        orm_mode = True
     
-# Cria um Modelo de usuario
-class UserBase(BaseModel):
-    username: str
-    email: EmailStr
 
 # Cria um Modelo de usuario com role padrão com Funcionario
-class UserIn(UserBase):    
+class UserIn(BaseModel):    
+    username: str
+    email: EmailStr
     password: str
     role: Optional[RoleType] = RoleType.FUNCIONARIO 
 
 # Cria um modelo para representar um usuario existente no Banco de Dados
-class UserOut(UserBase):
+class UserOut(UserIn):
     id: Optional [int]
     is_active: Optional [bool] = True # Por padrão o usuario é ativo
     is_admin: Optional [bool] = False # Por padrão o usuario não é admin
+    role: Optional [RoleType] = RoleType.FUNCIONARIO # Por padrão o usuario é um Funcionario
+    password: Optional [str] = None # fara com que a senha não seja retornada
 
     class Config:
         #from_attributes = True

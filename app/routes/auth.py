@@ -23,8 +23,15 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 def login(user_in: UserIn, db: Session = Depends(get_db)):
     # Busca usuario no Banco de Dados    
     db_user = user_repositories.get_user_by_email(db, user_in.email)   
-    # Verifica se o usuario está ativo 
     
+    # Verifica se o usuário existe antes de acessar seus atributos
+    if db_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado"
+        )
+    
+    # Verifica se o usuário está ativo
     if user_repositories.get_user_is_active(db, db_user.username) == False:        
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     
@@ -35,18 +42,23 @@ def login(user_in: UserIn, db: Session = Depends(get_db)):
             detail="Usuario não encontrado"
         )
     
-
+    # Verifica se a senha está correta
     if not security.verify_password(user_in.password, db_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Senha Incorreta",
             headers={"WWW-Authenticate" : "Beares"}
         )
-    # Cria o Token Jwt
-    # print(f"Gerando o token para Usuario {db_user.username}")    
+    # Cria o Token Jwt    
     token = security.create_access_token({"sub" : db_user.email})
-
-    # print(f"Token Gerado: {token}")  # <--- Adicionando log para depuração
+    
+    # Busca a Role desse Usuario e atualiza pelo Valor de entrada
+    db_role = db.query(user_db.DBRole).filter(user_db.DBRole.user_id == db_user.id).first()
+    if db_role is None:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Role do usuário não encontrada"
+        )
 
     response_data = {
         "access_token": token,
@@ -55,7 +67,8 @@ def login(user_in: UserIn, db: Session = Depends(get_db)):
         "username": db_user.username,
         "email": db_user.email,
         "is_active": db_user.is_active,
-        "is_admin": db_user.is_admin
+        "is_admin": db_user.is_admin,
+        "role": db_role.role_type
     }
 
     # print(f"Resposta Final: {response_data}")  # <--- Adicionando log para depuração
