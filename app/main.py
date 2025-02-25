@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status, Request
+from fastapi.exceptions import RequestValidationError
+from starlette.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.base import create_all
 from app.models.database import initialize_admin
@@ -19,6 +21,22 @@ async def lifespan(app: FastAPI):
     yield # Abaixo pode ser inserido um codigo para quando a aplicação para de rodar
 
 app = FastAPI(lifespan=lifespan, title="API Sistema de Gestão de Segurança", version="0.1")
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    erros = {}
+
+    for error in exc.errors():
+        campo = error["loc"][-1] # Pega apenas o campo nome
+        mensagem = "O campo é obrigatorio" if error["type"] == "value_error.missing" else error["msg"]
+        erros[campo] = mensagem
+    
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST, 
+        content={"detail": "Erros de validação", "fields": erros}
+        )
+
 
 # Configuração do CORS
 app.add_middleware(

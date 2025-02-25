@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
+from fastapi.exceptions import RequestValidationError
+from starlette.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 from app.models.base import get_db
@@ -52,6 +54,17 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 # Criando um novo usuario
 @router.post("/users/", response_model= UserOut, dependencies=[Depends(require_admin)], status_code=status.HTTP_201_CREATED)
 def create_user(user_in: UserIn, db: Session = Depends(get_db)):
+    if user_in.email is None or user_in.username is None or user_in.password is None or user_in.role is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Os campos 'email', 'username', 'password' e 'role' são obrigatórios"
+    )
+
+    print(f'User In Username: {user_in.username}')
+    print(f'User In Email: {user_in.email}')
+    print(f'User In Role: {user_in.role}')
+    print(f'User In Password: {user_in.password}')
+
     '''Rota para criar um novo usuario'''
     try:
         return register_user(db, user_in)

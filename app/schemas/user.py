@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, constr
 from typing import Union, Optional
 from enum import Enum
 
@@ -18,9 +18,9 @@ class RoleOUt(BaseModel):
 
 # Cria um Modelo de usuario com role padrão com Funcionario
 class UserIn(BaseModel):    
-    username: str
+    username: constr(min_length=1, strip_whitespace=True)  # Não pode ser vazio str
     email: EmailStr
-    password: str
+    password: constr(min_length=4, strip_whitespace=True)  # Não pode ser vazio str
     role: Optional[RoleType] = RoleType.FUNCIONARIO 
 
 # Cria um modelo para representar um usuario existente no Banco de Dados

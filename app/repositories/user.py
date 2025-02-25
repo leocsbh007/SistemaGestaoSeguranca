@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-from app.models.user import DBUser, DBRole
+from app.models.user import DBUser, DBRole, RoleType
 from app.schemas.user import UserIn
 from app.auth import security
 import logging
@@ -40,6 +40,15 @@ def get_user_is_active(db: Session, user_name: str) -> bool:
 def create_user(db: Session, user_in: UserIn) -> DBUser:
 
     try:        
+         # Validação do role
+        try:
+            new_role = RoleType(user_in.role)  # Converte a string para enum
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Role inválida: {user_in.role}. Deve ser um dos seguintes: {[r.value for r in RoleType]}"
+            )
+        
         hashed_password_in = security.hash_password(user_in.password)
 
         # Cria um Objeto Usuario para adicionar no Banco
@@ -51,21 +60,24 @@ def create_user(db: Session, user_in: UserIn) -> DBUser:
 
         # Cria um Objeto role para adicionar no Banco
         db_role = DBRole(
-            role_type=user_in.role,
+            role_type=new_role,
             user=db_user
         )
-        # print(f'Role: {new_role.role_type}')
-       
-        # Verifica se o usuario é Admin 
-        if db_role.role_type == 'ADMIN':            
-            db_user.is_admin = True
-        
-        # Adiciona o novo Role no Banco
-        db.add(db_role)
 
-        # Adiciona o novo Usuario no Banco
+        # Atualiza a role se necessário
+        if db_role.role_type != new_role:
+            db_role.role_type = new_role   
+
+        # Verifica se o usuário deve ser admin
+        db_user.is_admin = new_role == RoleType.ADMIN
+        
+        # Adiciona o novo Role e usuario no Banco
+        db.add(db_role)
         db.add(db_user)
         db.commit()
+
+        # Garante o dado mais recente
+        db.refresh(db_role)
         db.refresh(db_user)
 
         #LOG do cadastros
@@ -76,7 +88,7 @@ def create_user(db: Session, user_in: UserIn) -> DBUser:
         return db_user        
 
     except Exception as e:
-        logger.error(f"Erro ao criar o usuário {e}")
+        logger.error(f"Erro ao criar o usuário {str(e)}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
