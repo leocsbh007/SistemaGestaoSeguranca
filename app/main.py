@@ -10,11 +10,16 @@ from contextlib import asynccontextmanager
 # Para iniciar a aplicação e criar as tabelas do banco
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+
     create_all() # Cria as tabelas do Banco
-    # UserCreate.model_rebuild()  # Chama o método rebuild()
+    
+    # Apos criar a tabela verifica se existe um admin cadastrado
+    initialize_admin()  
+
     yield # Abaixo pode ser inserido um codigo para quando a aplicação para de rodar
 
 app = FastAPI(lifespan=lifespan, title="API Sistema de Gestão de Segurança", version="0.1")
+
 # Configuração do CORS
 app.add_middleware(
     CORSMiddleware,
@@ -24,9 +29,6 @@ app.add_middleware(
     allow_headers=["*"],  # Permitir todos os cabeçalhos
 )
 
-
-#with next(get_db()) as db:
-initialize_admin()
 
 # Incluindo as rotas no app Fast API
 app.include_router(auth_router, prefix="", tags=["Auth"])
