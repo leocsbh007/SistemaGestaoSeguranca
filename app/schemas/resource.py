@@ -1,30 +1,47 @@
 from pydantic import BaseModel
-from typing import Optional
+from datetime import datetime
 from enum import Enum
+from typing import Optional
 
+# Definição dos tipos de recursos e status
 class ResourceType(str, Enum):
-    EQUIPAMENTO = "EQUIPAMENTO"
-    VEICULO = "VEICULO"
-    DISPOPSITIVO_SEGURANCA = "DISPOSITIVO_SEGURANCA"
-
+    EQUIPMENTO = 'EQUIPAMENTO'
+    VEICULO = 'VEICULO'
+    DISPOSITIVO_SEGURANCA = 'DISPOSITIVO_SEGURANCA'
 
 class StatusType(str, Enum):
-    DISPONIVEL = "DISPONIVEL"
-    EM_USO = "EM_USO"
-    MANUTENCAO = "MANUTENCAO"
+    DISPONIVEL = 'DISPONIVEL'
+    EM_USO = 'EM USO'
+    MANUTENCAO = 'MANUTENCAO'
 
-class ResourceBase(BaseModel):
+# Esquema para criação de um novo recurso
+class ResourceCreate(BaseModel):
     name: str
-    description: Optional[str] = None
-    type : Optional [ResourceType] = None   # Tipo de recurso, deve ser adiciona quando o recurso for criado, pois ainda não sabemos o tipo até o usuário informar
+    type: ResourceType
+    description: str
     status: StatusType = StatusType.DISPONIVEL
 
     class Config:
-        orm_mode = True     # Permite que o Pydantic possa entender o retorno do ORM
+        orm_mode = True
 
-class ResourceResponse(ResourceBase):
-    id: int     # O ID é obrigatório para a resposta
-    assigned_to : Optional[int] = None # ID do usuário que está com o recursos, por padrão é None, pois o recurso está disponível
+# Esquema para atualização de um recurso
+class ResourceUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[ResourceType] = None
+    description: Optional[str] = None
+    status: Optional[StatusType] = None
 
+    class Config:
+        orm_mode = True
+
+# Esquema de saída (resposta da API)
+class ResourceOut(BaseModel):
+    id: int
+    name: str
+    type: ResourceType
+    description: str
+    status: StatusType
+    assigned_to: Optional[int]
+    
     class Config:
         orm_mode = True

@@ -6,6 +6,7 @@ from app.models.base import create_all
 from app.models.database import initialize_admin
 from app.routes.auth import router as auth_router  # Importando as rotas de autenticação
 from app.routes.user import router as user_router  # Importando as rotas de usuários
+from app.routes.resource import router as resource_router  # Importando as rotas de recursos
 from contextlib import asynccontextmanager
 
 
@@ -51,6 +52,7 @@ app.add_middleware(
 # Incluindo as rotas no app Fast API
 app.include_router(auth_router, prefix="", tags=["Auth"])
 app.include_router(user_router, prefix="", tags=["User"])
+app.include_router(resource_router, prefix="", tags=["Resource"])
 
 @app.get("/")
 def read_root():
