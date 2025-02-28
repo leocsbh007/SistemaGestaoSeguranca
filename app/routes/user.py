@@ -104,11 +104,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 # Altera Usuario
 @router.put("/users/{user_id_put}", response_model=UserOut, dependencies=[Depends(require_admin)])
 def update_user(user_id_put: int, user_in: UserIn, db: Session = Depends(get_db)):
-    print(f'User In Username: {user_in.username}')
-    print(f'User In Email: {user_in.email}')
-    print(f'User In Role: {user_in.role}')
-    print(f'User In Password: {user_in.password}')
-    
+    '''Rota para atualizar um usuario'''  
     db_user = user_repositories.get_user_by_id(db, user_id_put)
     if db_user is None:
         raise HTTPException(
@@ -131,12 +127,12 @@ def update_user(user_id_put: int, user_in: UserIn, db: Session = Depends(get_db)
         hashed_password_in = db_user.hashed_password
 
     # Atualiza os campos para inserir no Banco
-    for key, value in user_in.dict(exclude_unset=True).items():
-        setattr(db_user, key, value)
+    # for key, value in user_in.dict(exclude_unset=True).items():
+    #     setattr(db_user, key, value)
 
-    # db_user.username = user_in.username
-    # db_user.hashed_password = hashed_password_in
-    # db_user.email = user_in.email
+    db_user.username = user_in.username
+    db_user.hashed_password = hashed_password_in
+    db_user.email = user_in.email
     
     # Busca a Role desse Usuario e atualiza pelo Valor de entrada
     db_role = db.query(user_db.DBRole).filter(user_db.DBRole.user_id == user_id_put).first()

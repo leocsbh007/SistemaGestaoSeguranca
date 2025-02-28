@@ -23,6 +23,9 @@ class UserIn(BaseModel):
     password: constr(min_length=4, strip_whitespace=True)  # Não pode ser vazio str
     role: Optional[RoleType] = RoleType.FUNCIONARIO 
 
+    class Config:
+        orm_mode = True
+
 # Cria um modelo para representar um usuario existente no Banco de Dados
 class UserOut(UserIn):
     id: Optional [int]

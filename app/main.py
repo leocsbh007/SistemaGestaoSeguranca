@@ -42,7 +42,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # Configuração do CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],  # Permitir apenas o front-end local
+    # allow_origins=["http://127.0.0.1:5500"],  # Permitir apenas o front-end local
+    allow_origins=["*"],  # Permitir qualquer origem, em projetos reais deve ser restrito
     allow_credentials=True,
     allow_methods=["*"],  # Permitir todos os métodos (GET, POST, etc.)
     allow_headers=["*"],  # Permitir todos os cabeçalhos

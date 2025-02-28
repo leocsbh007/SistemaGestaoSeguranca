@@ -85,7 +85,15 @@ def create_user(db: Session, user_in: UserIn) -> DBUser:
 
         # Retorna os dados como Pydantic (convertendo o objeto SQLAlchemy)
         # Conversão usando from_orm
-        return db_user        
+        # return db_user        
+        return {
+            "id": db_user.id,
+            "username": db_user.username,
+            "email": db_user.email,
+            "role": db_role.role_type.value,
+            "is_active": db_user.is_active,
+            "is_admin": db_user.is_admin
+        }
 
     except Exception as e:
         logger.error(f"Erro ao criar o usuário {str(e)}")
