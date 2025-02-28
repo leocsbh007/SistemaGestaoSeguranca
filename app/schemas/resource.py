@@ -5,17 +5,18 @@ from typing import Optional
 
 # Definição dos tipos de recursos e status
 class ResourceType(str, Enum):
-    EQUIPMENTO = 'EQUIPAMENTO'
-    VEICULO = 'VEICULO'
+    EQUIPAMENTO = 'EQUIPAMENTO'
+    VEICULO = 'VEICULO'    
     DISPOSITIVO_SEGURANCA = 'DISPOSITIVO_SEGURANCA'
 
 class StatusType(str, Enum):
     DISPONIVEL = 'DISPONIVEL'
-    EM_USO = 'EM USO'
+    EM_USO = 'EM_USO'
     MANUTENCAO = 'MANUTENCAO'
 
 # Esquema para criação de um novo recurso
-class ResourceCreate(BaseModel):
+class ResourceIn(BaseModel):
+    asset_number: str
     name: str
     type: ResourceType
     description: str
@@ -25,23 +26,10 @@ class ResourceCreate(BaseModel):
         orm_mode = True
 
 # Esquema para atualização de um recurso
-class ResourceUpdate(BaseModel):
-    name: Optional[str] = None
-    type: Optional[ResourceType] = None
-    description: Optional[str] = None
-    status: Optional[StatusType] = None
-
-    class Config:
-        orm_mode = True
-
-# Esquema de saída (resposta da API)
-class ResourceOut(BaseModel):
-    id: int
-    name: str
-    type: ResourceType
-    description: str
-    status: StatusType
-    assigned_to: Optional[int]
+class ResourceOut(ResourceIn):
+    id: Optional[int]
     
     class Config:
         orm_mode = True
+
+

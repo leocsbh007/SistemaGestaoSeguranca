@@ -131,9 +131,12 @@ def update_user(user_id_put: int, user_in: UserIn, db: Session = Depends(get_db)
         hashed_password_in = db_user.hashed_password
 
     # Atualiza os campos para inserir no Banco
-    db_user.username = user_in.username
-    db_user.hashed_password = hashed_password_in
-    db_user.email = user_in.email
+    for key, value in user_in.dict(exclude_unset=True).items():
+        setattr(db_user, key, value)
+
+    # db_user.username = user_in.username
+    # db_user.hashed_password = hashed_password_in
+    # db_user.email = user_in.email
     
     # Busca a Role desse Usuario e atualiza pelo Valor de entrada
     db_role = db.query(user_db.DBRole).filter(user_db.DBRole.user_id == user_id_put).first()

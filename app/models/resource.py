@@ -3,15 +3,15 @@ from sqlalchemy.orm import relationship
 from app.models.base import Base
 import enum
 
-# Definição dos tipos de recursos
+# Definição dos tipos de recursos e status
 class ResourceType(enum.Enum):
-    EQUIPMENTO = 'EQUIPAMENTO'
-    VEICULO = 'VEICULO'
+    EQUIPAMENTO = 'EQUIPAMENTO'
+    VEICULO = 'VEICULO'    
     DISPOSITIVO_SEGURANCA = 'DISPOSITIVO_SEGURANCA'
 
 class StatusType(enum.Enum):
     DISPONIVEL = 'DISPONIVEL'
-    EM_USO = 'EM USO'
+    EM_USO = 'EM_USO'
     MANUTENCAO = 'MANUTENCAO'
 
 
@@ -20,8 +20,9 @@ class DBResource(Base):
     __tablename__ = 'resources'
 
     id = Column(Integer, primary_key=True, index=True) # Identificador do recurso
+    asset_number = Column(String, nullable=False) # Número de patrimônio do recurso, obrigatório
     name = Column(String, nullable=False) # Nome do recurso, obrigatório
-    type = Column(Enum(ResourceType), nullable=False) # Tipo do recurso, obrigatório. Deve ser um dos valores definidos em ResourseType
+    type = Column(Enum(ResourceType), nullable=False) # Tipo do recurso, obrigatório. Deve ser um dos valores definidos em ResourceType
     description = Column(String, nullable=False) # Descrição do recurso, obrigatório
     status = Column(Enum(StatusType), nullable=False, default=StatusType.DISPONIVEL) # Status do recurso, obrigatório. Deve ser um dos valores definidos em StatusType
 
