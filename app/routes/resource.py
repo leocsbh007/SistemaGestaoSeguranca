@@ -28,7 +28,7 @@ def get_resources(db: Session = Depends(get_db)):
 
     resources = db.query(resource_db.DBResource).all()
     
-    if resources is None:
+    if not resources:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
             detail="Recurso não encontrado"

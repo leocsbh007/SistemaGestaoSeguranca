@@ -24,6 +24,12 @@ def get_users(db: Session = Depends(get_db)):
     '''Rota para listar todos os usuarios, inclui a Role do Usuario'''
     users = db.query(user_db.DBUser).options(joinedload(user_db.DBUser.role)).all()
 
+    if not users:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Nenhum usuário encontrado"
+            )
+
     # Agora, vamos instanciar `UserOut` para cada usuário
     user_outs = []
     for user in users:
