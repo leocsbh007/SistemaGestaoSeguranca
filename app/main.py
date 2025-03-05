@@ -6,6 +6,7 @@ from app.models.base import create_all
 from app.models.database import initialize_admin
 from app.routes.auth import router as auth_router  # Importando as rotas de autenticação
 from app.routes.user import router as user_router  # Importando as rotas de usuários
+from app.routes.loan import router as loan_router
 from app.routes.resource import router as resource_router  # Importando as rotas de recursos
 from contextlib import asynccontextmanager
 
@@ -42,8 +43,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # Configuração do CORS
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=["http://127.0.0.1:5500"],  # Permitir apenas o front-end local
-    allow_origins=["*"],  # Permitir qualquer origem, em projetos reais deve ser restrito
+    allow_origins=["http://127.0.0.1:5501"],  # Permitir apenas o front-end local
+    # allow_origins=["*"],  # Permitir qualquer origem, em projetos reais deve ser restrito
     allow_credentials=True,
     allow_methods=["*"],  # Permitir todos os métodos (GET, POST, etc.)
     allow_headers=["*"],  # Permitir todos os cabeçalhos
@@ -54,6 +55,7 @@ app.add_middleware(
 app.include_router(auth_router, prefix="", tags=["Auth"])
 app.include_router(user_router, prefix="", tags=["User"])
 app.include_router(resource_router, prefix="", tags=["Resource"])
+app.include_router(loan_router, prefix="",tags=["Loan"])
 
 @app.get("/")
 def read_root():

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-from app.models.resource import DBResource, ResourceType, StatusType
+from app.models.resource import DBResource
 from app.schemas.resource import ResourceIn
-from app.auth import security
 import logging
 
 # Configuração de Logger para log

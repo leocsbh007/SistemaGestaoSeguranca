@@ -15,8 +15,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Criação da Classe base para todos os modelos
 Base = declarative_base()
 
-
-
 # para fornecer a sessão para cada requisição ao banco, para gerenciar as conexões ao banco
 def get_db():
     db = SessionLocal()

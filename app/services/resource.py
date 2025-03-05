@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.repositories import resource as resource_repositories
 from app.schemas.resource import ResourceIn, ResourceOut

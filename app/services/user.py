@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.repositories import user as user_repositories
 from app.schemas.user import UserIn, UserOut

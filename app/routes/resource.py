@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -34,16 +34,15 @@ def get_resources(db: Session = Depends(get_db)):
             detail="Recurso não encontrado"
             )
     
-    resources_out = []
-    # Garantindo que os valores de 'type' e 'status' sejam strings
+    resources_out = []    
     for resource in resources:
         resource_out = ResourceOut(
             id=resource.id,
             asset_number=resource.asset_number,
             name=resource.name,
-            type=resource.type.value,  # Convertendo o enum para string
+            type=resource.type.value,
             description=resource.description,
-            status=resource.status.value  # Convertendo o enum para string
+            status=resource.status.value
         )
         resources_out.append(resource_out)
     return resources_out

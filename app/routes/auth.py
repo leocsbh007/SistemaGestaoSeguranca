@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.models.base import get_db
-from app.models import user as user_db  # Para o modelo do banco
+from app.models import user as user_db
 from app.schemas.user import UserIn
 from app.auth import security
 from app.repositories import user as user_repositories
@@ -18,8 +18,7 @@ router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # Criando a Rota de Login
-@router.post("/login") # ANA
-# def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@router.post("/login")
 def login(user_in: UserIn, db: Session = Depends(get_db)):
     # Busca usuario no Banco de Dados    
     db_user = user_repositories.get_user_by_email(db, user_in.email)   
@@ -69,9 +68,7 @@ def login(user_in: UserIn, db: Session = Depends(get_db)):
         "is_active": db_user.is_active,
         "is_admin": db_user.is_admin,
         "role": db_role.role_type
-    }
-
-    # print(f"Resposta Final: {response_data}")  # <--- Adicionando log para depuração
+    }    
 
     return response_data
 
