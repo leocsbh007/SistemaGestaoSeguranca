@@ -1,6 +1,15 @@
-from app.services.auth import verify_password
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models.user import DBUser  # Supondo que você tenha um modelo User já definido
 
-senha_digitada = "senha123"
-senha_armazenada = "$2b$12$X...hash_do_banco..."
+# Crie o engine e a sessão
+engine = create_engine('sqlite:///meu_banco.db')
+Session = sessionmaker(bind=engine)
+session = Session()
 
-print(verify_password(senha_digitada, senha_armazenada))
+# Use o ORM para fazer a consulta
+users = session.query(DBUser).all()
+
+# Exiba os resultados
+for user in users:
+    print(user)
