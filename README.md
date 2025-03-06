@@ -3,7 +3,9 @@
 ## Descrição
 
 Este é um sistema de gestão de segurança desenvolvido com FastAPI, projetado para gerenciar usuários, recursos (equipamentos, veículos, etc.) e empréstimos. A API oferece autenticação baseada em JWT, autorização baseada em roles (ADMIN, FUNCIONARIO, GERENTE, ADMIN_SEGURANCA) e endpoints para operações CRUD em usuários, recursos e empréstimos. 
-Foi desenvolvido para atender as epecificações da Infinity School
+Foi desenvolvido para atender as epecificações da Infinity School.
+* **Infelizmente não consegui fazer a parte da Dashboard até a data de entrega 06/03/2025.**
+* **Todo o projeto foi feito usando as praticas de criação de branches e pull requets do git, para ter uma evolução consciente da aplicação, tive mais dificulades no inicio, pois ainda não estava entendendo tão bem o FastAPI, demorei muito na criação da autenticação de nas implementação de usuarios, quando consegui fechar as outras tabelas foi mais facil fazer, pois seguiam a mesma filosofia de implementação.**
 
 ## Funcionalidades
 
@@ -68,8 +70,10 @@ Foi desenvolvido para atender as epecificações da Infinity School
 ## Executando a Aplicação
 
 ```bash
-uvicorn app.main:app --port 8080 --reload 
-** por algum motivo a porta 8000 parou de funcionar **
+uvicorn app.main:app --port 8080 --reload
+```
+
+* por algum motivo a porta 8000 parou de funcionar **
 
 # Iniciando o Servidor Uvicorn
 
