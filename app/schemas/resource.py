@@ -26,7 +26,7 @@ class ResourceIn(BaseModel):
 
 # Esquema para atualização de um recurso
 class ResourceOut(ResourceIn):
-    id: Optional[int]
+    id: Optional[int]    
     
     class Config:
         orm_mode = True
