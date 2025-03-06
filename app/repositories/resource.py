@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-from app.models.resource import DBResource, ResourceType, StatusType
-from app.schemas.resource import ResourceIn
-from app.auth import security
+from app.models.resource import DBResource
+from app.schemas.resource import ResourceIn, ResourceOut
 import logging
 
 # Configuração de Logger para log
@@ -23,7 +22,7 @@ def get_resource_by_id(db: Session, resource_id: int) -> DBResource | None:
     response = db.query(DBResource).filter(DBResource.id == resource_id).first()
     return response
 
-def create_resource(db: Session, resource_in: ResourceIn) -> DBResource:
+def create_resource(db: Session, resource_in: ResourceIn) -> ResourceOut:
 
     try:        
         # Validação do tipo de recurso       
@@ -35,16 +34,15 @@ def create_resource(db: Session, resource_in: ResourceIn) -> DBResource:
         #LOG do cadastros
         logger.info(f"Recurso {db_resource.name} criado com Sucesso!")                
 
-        # return db_resource
-        return {
-            "id": db_resource.id,
-            "asset_number": db_resource.asset_number,
-            "name": db_resource.name,
-            "type": db_resource.type.value,  # Converte Enum para string
-            "description": db_resource.description,
-            "status": db_resource.status.value,  # Converte Enum para string
-            "assigned_to": db_resource.assigned_to
-        }
+        # return resource_out
+        return ResourceOut(
+            id = db_resource.id,
+            asset_number = db_resource.asset_number,
+            name = db_resource.name,
+            type = db_resource.type.value,
+            description = db_resource.description,
+            status = db_resource.status.value,
+        )
 
     except Exception as e:
         logger.error(f"Erro ao criar o Recurso {str(e)}")

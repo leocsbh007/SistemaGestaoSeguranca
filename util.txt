@@ -50,3 +50,7 @@ Ou, caso ela ainda não tenha sido criada localmente:
 git checkout -b nome-da-branch origin/nome-da-branch
 
 Isso cria uma branch local com base na branch remota.
+
+
+5 - Criação de dados no banco security.db
+py -m app.script_gerar_dados

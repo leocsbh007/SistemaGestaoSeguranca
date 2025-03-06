@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 
 class LonasStatus(enum.Enum):
     ATIVO = 'ATIVO'
-    FINALIZADO = 'FINALIZADO'
-    ATRASADO = 'ATRASADO'
+    FINALIZADO = 'FINALIZADO'   # No contexto da minha aplicação será marcado como finalizado quando o emprestimo acabar
+    ATRASADO = 'ATRASADO'  # no contexto da minha aplicão será marcado quando for entregue com atraso
 
 class DBLoan(Base):
     __tablename__ = 'loans'

@@ -1,10 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends, status, Request
-from fastapi.exceptions import RequestValidationError
-from starlette.responses import JSONResponse
+from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 from app.models.base import get_db
-from app.models import user as user_db  # Para o modelo do banco
+from app.models import user as user_db
 from app.schemas.user import UserIn, UserOut, RoleType
 from app.services.user import register_user
 from app.auth.middleware import require_admin, get_current_user
@@ -30,7 +28,6 @@ def get_users(db: Session = Depends(get_db)):
             detail="Nenhum usuário encontrado"
             )
 
-    # Agora, vamos instanciar `UserOut` para cada usuário
     user_outs = []
     for user in users:
         user_out = UserOut(
@@ -39,13 +36,11 @@ def get_users(db: Session = Depends(get_db)):
             email=user.email,
             is_active=user.is_active,
             is_admin=user.is_admin,
-            role=user.role.role_type.value if user.role else user_db.RoleType.FUNCIONARIO  # Atribuindo o role_type de role
+            role=user.role.role_type.value if user.role else user_db.RoleType.FUNCIONARIO
         )
         user_outs.append(user_out)
     return user_outs     
     
-
-# Rota para buscar um usuario pelo ID
 @router.get("/users/{user_id}", response_model=UserOut, dependencies=[Depends(get_current_user)])
 def get_user(user_id: int, db: Session = Depends(get_db)):
     '''Rota para buscar um usuario pelo ID'''
@@ -57,7 +52,6 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         )
     return db_user
 
-# Criando um novo usuario
 @router.post("/users/", response_model= UserOut, dependencies=[Depends(require_admin)], status_code=status.HTTP_201_CREATED)
 def create_user(user_in: UserIn, db: Session = Depends(get_db)):
     if user_in.email is None or user_in.username is None or user_in.password is None or user_in.role is None:
@@ -66,12 +60,6 @@ def create_user(user_in: UserIn, db: Session = Depends(get_db)):
             detail="Os campos 'email', 'username', 'password' e 'role' são obrigatórios"
     )
 
-    print(f'User In Username: {user_in.username}')
-    print(f'User In Email: {user_in.email}')
-    print(f'User In Role: {user_in.role}')
-    print(f'User In Password: {user_in.password}')
-
-    '''Rota para criar um novo usuario'''
     try:
         return register_user(db, user_in)
     except Exception as e:
@@ -80,8 +68,6 @@ def create_user(user_in: UserIn, db: Session = Depends(get_db)):
             detail="Erro ao criar o Usuario, usuário já existe"
         )    
     
-    
-# Deletando um usuario
 @router.delete("/users/{user_id}", dependencies=[Depends(require_admin)])
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     # print(f'User ID: {user_id}')
@@ -106,8 +92,6 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
             detail="Erro ao deletar o usuario"
         )
 
-
-# Altera Usuario
 @router.put("/users/{user_id_put}", response_model=UserOut, dependencies=[Depends(require_admin)])
 def update_user(user_id_put: int, user_in: UserIn, db: Session = Depends(get_db)):
     '''Rota para atualizar um usuario'''  
@@ -128,8 +112,7 @@ def update_user(user_id_put: int, user_in: UserIn, db: Session = Depends(get_db)
     # Verifica se a senha não veio nula
     if user_in.password:
         hashed_password_in = security.hash_password(user_in.password)
-    else:
-        # Verifica se a senha não veio nula        
+    else:        
         hashed_password_in = db_user.hashed_password
 
     # Atualiza os campos para inserir no Banco
@@ -150,7 +133,7 @@ def update_user(user_id_put: int, user_in: UserIn, db: Session = Depends(get_db)
     
     # Valida se a role fornecida é válida antes de atualizar
     try:
-        new_role = RoleType(user_in.role)  # Converte string para enum
+        new_role = RoleType(user_in.role)
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

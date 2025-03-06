@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from datetime import datetime
 from enum import Enum
 from typing import Optional
 
@@ -27,7 +26,7 @@ class ResourceIn(BaseModel):
 
 # Esquema para atualização de um recurso
 class ResourceOut(ResourceIn):
-    id: Optional[int]
+    id: Optional[int]    
     
     class Config:
         orm_mode = True

@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -25,37 +25,40 @@ def create_resource(resource_in: ResourceIn, db: Session = Depends(get_db)):
 
 @router.get("/resources/", response_model=List[ResourceOut], dependencies=[Depends(get_current_user)])
 def get_resources(db: Session = Depends(get_db)):
-
-    resources = db.query(resource_db.DBResource).all()
-    
+    resources = db.query(resource_db.DBResource).all()    
     if not resources:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
             detail="Recurso não encontrado"
             )
     
-    resources_out = []
-    # Garantindo que os valores de 'type' e 'status' sejam strings
+    resources_out = []    
     for resource in resources:
         resource_out = ResourceOut(
             id=resource.id,
             asset_number=resource.asset_number,
             name=resource.name,
-            type=resource.type.value,  # Convertendo o enum para string
+            type=resource.type.value,
             description=resource.description,
-            status=resource.status.value  # Convertendo o enum para string
+            status=resource.status.value,            
         )
         resources_out.append(resource_out)
     return resources_out
 
-
-
 @router.get("/resources/{resource_id}", response_model=ResourceOut, dependencies=[Depends(get_current_user)])
-def get_resource(resource_id: int, db: Session = Depends(get_db)):
+def get_resource(resource_id: int, db: Session = Depends(get_db)) -> ResourceOut:
     resource = db.query(resource_db.DBResource).filter(resource_db.DBResource.id == resource_id).first()
     if not resource:
         raise HTTPException(status_code=404, detail="Recurso não encontrado")
-    return resource
+    
+    return ResourceOut(
+            id=resource.id,
+            asset_number=resource.asset_number,
+            name=resource.name,
+            type=resource.type.value,
+            description=resource.description,
+            status=resource.status.value,            
+        )
 
 @router.put("/resources/{resource_id}", response_model=ResourceOut, dependencies=[Depends(require_admin)])
 def update_resource(resource_id: int, resource_in: ResourceIn, db: Session = Depends(get_db)):
