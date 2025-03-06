@@ -31,6 +31,25 @@ def get_loans(db: Session = Depends(get_db)):
         loan_outs.append(loan_out)
     return loan_outs
 
+@router.get("/loans/{loan_id}", response_model=LoanOut, dependencies=[Depends(get_current_user)])
+def get_loans(loan_id: int, db: Session = Depends(get_db)) -> LoanOut:
+    db_loan = db.query(loan_db.DBLoan).filter(loan_db.DBLoan.id == loan_id).first()
+    
+    if not db_loan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Nenhum emprestimo não encontrado"
+    )
+
+    return LoanOut(
+            id=db_loan.id,
+            user_id=db_loan.user_id,
+            resource_id=db_loan.resource_id,
+            start_date=db_loan.start_date,
+            status=db_loan.status.value,
+            calculated_end_date=db_loan.end_date
+        )       
+
 
 @router.post("/loans/", response_model=LoanOut, dependencies=[Depends(require_admin)], status_code=status.HTTP_201_CREATED)
 def create_loan(loan_in: LoanIn, db: Session = Depends(get_db)) -> LoanOut:    
