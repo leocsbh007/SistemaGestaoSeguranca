@@ -13,6 +13,10 @@ def get_loan_by_resource_id(db: Session, resource_id: int) -> DBLoan | None:
     response = db.query(DBLoan).filter(DBLoan.resource_id == resource_id).first()
     return response
 
+def get_loan_by_loan_id(db: Session, loan_id: int) -> DBLoan | None:    
+    response = db.query(DBLoan).filter(DBLoan.id == loan_id).first()
+    return response
+
 def create_loan(db: Session, loan_in: LoanIn) -> LoanOut:
     try:               
         resource_db = db.query(DBResource).filter(DBResource.id == loan_in.resource_id).first()

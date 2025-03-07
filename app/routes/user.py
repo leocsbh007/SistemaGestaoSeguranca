@@ -42,7 +42,7 @@ def get_users(db: Session = Depends(get_db)):
     return user_outs     
     
 @router.get("/users/{user_id}", response_model=UserOut, dependencies=[Depends(get_current_user)])
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user(user_id: int, db: Session = Depends(get_db)) -> UserOut:
     '''Rota para buscar um usuario pelo ID'''
     db_user = db.query(user_db.DBUser).filter(user_db.DBUser.id == user_id).first()
     if db_user is None:
@@ -50,7 +50,14 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario não encontrado"
         )
-    return db_user
+    return UserOut(
+        id=db_user.id,
+        username=db_user.username,
+        email=db_user.email,
+        is_active=db_user.is_active,
+        is_admin=db_user.is_admin,
+        role_type=db_user.role
+    )
 
 @router.post("/users/", response_model= UserOut, dependencies=[Depends(require_admin)], status_code=status.HTTP_201_CREATED)
 def create_user(user_in: UserIn, db: Session = Depends(get_db)):

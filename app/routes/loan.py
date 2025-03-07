@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from app.models.base import get_db
 from app.services.loan import register_loan
 from app.models.resource import DBResource, StatusType
 from app.models import loan as loan_db
 from app.schemas.loan import LoanIn, LoanOut
+from app.repositories import loan as loan_repositories
 from app.auth.middleware import get_current_user, require_admin
 
 router = APIRouter()
@@ -60,6 +62,41 @@ def create_loan(loan_in: LoanIn, db: Session = Depends(get_db)) -> LoanOut:
     )    
     return register_loan(db, loan_in)  
 
+@router.put("/loans/{loan_id}", response_model=LoanOut, dependencies=[Depends(require_admin)])
+def update_resource(loan_id: int, loan_in: LoanIn, db: Session = Depends(get_db)) -> LoanOut:
+    db_loan = loan_repositories.get_loan_by_loan_id(db, loan_id)     
+    if not db_loan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Emprestimo não encontrado"
+        )
+    
+    # exist_resource_id = loan_repositories.get_loan_by_resource_id(db, loan_in.resource_id)
+    # if exist_resource_id is not None and exist_resource_id.resource_id != db_loan.resource_id:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="O recurso já existe esta Emprestado"
+    #     )
+    
+    # A unica coisa permitida para ser alterada é o status do emprestimo, pois o registro serve para relatorios futuros
+    db_loan.status = loan_in.status
+    try:
+        db.commit()        
+        db.refresh(db_loan)
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao atualizar o recurso no banco de dados"
+        )
+    return LoanOut(
+            id=db_loan.id,
+            user_id=db_loan.user_id,
+            resource_id=db_loan.resource_id,
+            start_date=db_loan.start_date,
+            status=db_loan.status.value,
+            calculated_end_date=db_loan.end_date
+        )
 
 @router.delete("/loans/{loan_id}", dependencies=[Depends(require_admin)])
 def delete_resource(loan_id: int, db: Session = Depends(get_db)) -> dict:
