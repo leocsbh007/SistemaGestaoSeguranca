@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 # Roteador para as rotas de autenticação
 router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+#oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # Criando a Rota de Login
 @router.post("/login")
@@ -46,7 +47,8 @@ def login(user_in: UserIn, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Senha Incorreta",
-            headers={"WWW-Authenticate" : "Beares"}
+            #headers={"WWW-Authenticate" : "Beares"}
+            headers={"WWW-Authenticate": "Bearer"}
         )
     # Cria o Token Jwt    
     token = security.create_access_token({"sub" : db_user.email})
