@@ -22,8 +22,7 @@ async def lifespan(app: FastAPI):
 
     yield # Abaixo pode ser inserido um codigo para quando a aplicação para de rodar
 
-app = FastAPI(lifespan=lifespan, title="API Sistema de Gestão de Segurança", version="0.1", description= "Para acessar - Email: admin@email.com
-Senha: admin1234")
+app = FastAPI(lifespan=lifespan, title="API Sistema de Gestão de Segurança", version="0.1", description= "Para acessar - Email: admin@email.com Senha: admin1234")
 
 
 @app.exception_handler(RequestValidationError)
